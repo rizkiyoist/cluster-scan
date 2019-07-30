@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"math/rand"
 	"os"
 )
 
@@ -25,14 +26,17 @@ func main() {
 	k.q = 4
 	k.x = 1
 	k.y = 1
-	kitchenPoints, _ := k.getKitchenArea(8)
+	kitchenPoints, _ := k.getKitchenArea(66)
+
 	// Create canvas image
-	img := image.NewRGBA(image.Rect(-10, -10, 50, 50))
+	img := image.NewRGBA(image.Rect(-25, -25, 50, 50))
 	var count int
 	for c, kp := range kitchenPoints {
-
-		// Draw a red dot at x y
-		switch kp.q {
+		// draw
+		col := rand.Intn(5)
+		switch col {
+		case 0:
+			img.Set(kp.x, kp.y, color.RGBA{255, 0, 255, 255})
 		case 1:
 			img.Set(kp.x, kp.y, color.RGBA{255, 0, 0, 255})
 		case 2:
@@ -41,6 +45,8 @@ func main() {
 			img.Set(kp.x, kp.y, color.RGBA{0, 0, 255, 255})
 		case 4:
 			img.Set(kp.x, kp.y, color.RGBA{255, 255, 0, 255})
+		case 5:
+			img.Set(kp.x, kp.y, color.RGBA{0, 255, 255, 255})
 		}
 		fmt.Println(kp.x, kp.y, kp.q)
 		count = c + 1
