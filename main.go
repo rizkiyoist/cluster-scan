@@ -28,7 +28,7 @@ func main() {
 	k.q = 1
 	k.x = 0
 	k.y = 0
-	kitchenPoints, _ := k.getKitchenArea(6)
+	kitchenPoints, _ := k.getKitchenArea(20)
 	for _, kp := range kitchenPoints {
 		fmt.Println(kp.x, kp.y, kp.q)
 	}
@@ -52,7 +52,7 @@ func (kc kitchen) getKitchenArea(size int) ([]cluster, error) {
 
 // scan every ring
 func (kc kitchen) scanBySize(size int) ([]cluster, error) {
-	// var c cluster
+	var tempCs []cluster
 	var cs []cluster
 	var cc cluster
 	var rc cluster
@@ -95,17 +95,17 @@ func (kc kitchen) scanBySize(size int) ([]cluster, error) {
 		}
 		switch curSize % 2 {
 		case 0:
+			// reverse diagonal
 			rc, _ = rc.getOneDiagonal(rcDir)
-			fmt.Println("getting reverse diagonal", rc.x, rc.y, rc.q)
 			cs = append(cs, rc)
-			// c, _ = cc.scanRing(diagonal, curSize)
-			// cs = append(cs, c...)
+			tempCs, _ = rc.scanRing(curSize, rcDir)
+			cs = append(cs, tempCs...)
 		case 1:
+			// diagonal
 			cc, _ = cc.getOneDiagonal(ccDir)
-			fmt.Println("getting diagonal", cc.x, cc.y, cc.q)
 			cs = append(cs, cc)
-			// c, _ = cc.scanRing(diagonal, curSize)
-			// cs = append(cs, c...)
+			tempCs, _ = cc.scanRing(curSize, ccDir)
+			cs = append(cs, tempCs...)
 		}
 
 	}
@@ -117,19 +117,15 @@ func (cc cluster) getOneDiagonal(direction string) (cluster, error) {
 	// check quadrant of current cluster, then get one diagonal based on direction
 	switch direction {
 	case "upright":
-		// get upright
 		c = getOne(cc, "up")
 		c = getOne(c, "right")
 	case "upleft":
-		// get upleft
 		c = getOne(cc, "up")
 		c = getOne(c, "left")
 	case "downleft":
-		// get downleft
 		c = getOne(cc, "down")
 		c = getOne(c, "left")
 	case "downright":
-		// get downright
 		c = getOne(cc, "down")
 		c = getOne(c, "right")
 	}
@@ -196,7 +192,34 @@ func getOne(cc cluster, direction string) cluster {
 	return c
 }
 
-func (cc cluster) scanRing(diagonal cluster, size int) ([]cluster, error) {
+func (cc cluster) scanRing(size int, start string) ([]cluster, error) {
 	var cs []cluster
+	var c cluster
+	c = cc
+	for i := 0; i <= size-1; i++ {
+		switch start {
+		//scan from
+		case "upright":
+			c = getOne(c, "down")
+			cs = append(cs, c)
+			c = getOne(c, "left")
+			cs = append(cs, c)
+		case "upleft":
+			c = getOne(c, "down")
+			cs = append(cs, c)
+			c = getOne(c, "right")
+			cs = append(cs, c)
+		case "downleft":
+			c = getOne(c, "right")
+			cs = append(cs, c)
+			c = getOne(c, "up")
+			cs = append(cs, c)
+		case "downright":
+			c = getOne(c, "up")
+			cs = append(cs, c)
+			c = getOne(c, "left")
+			cs = append(cs, c)
+		}
+	}
 	return cs, nil
 }
