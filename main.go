@@ -1,37 +1,55 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"image"
+	"image/color"
+	"image/png"
+	"os"
+)
 
 type cluster struct {
-	x int64
-	y int64
+	x int
+	y int
 	q int
 }
 
 type kitchen struct {
-	x int64
-	y int64
+	x int
+	y int
 	q int
-}
-
-type diagonalCluster struct {
-	xc int64
-	yc int64
-	qc int
-	xf int64
-	yf int64
-	qf int
 }
 
 func main() {
 	k := new(kitchen)
-	k.q = 1
-	k.x = 0
-	k.y = 0
-	kitchenPoints, _ := k.getKitchenArea(20)
-	for _, kp := range kitchenPoints {
+	k.q = 4
+	k.x = 1
+	k.y = 1
+	kitchenPoints, _ := k.getKitchenArea(8)
+	// Create canvas image
+	img := image.NewRGBA(image.Rect(-10, -10, 50, 50))
+	var count int
+	for c, kp := range kitchenPoints {
+
+		// Draw a red dot at x y
+		switch kp.q {
+		case 1:
+			img.Set(kp.x, kp.y, color.RGBA{255, 0, 0, 255})
+		case 2:
+			img.Set(kp.x, kp.y, color.RGBA{0, 255, 0, 255})
+		case 3:
+			img.Set(kp.x, kp.y, color.RGBA{0, 0, 255, 255})
+		case 4:
+			img.Set(kp.x, kp.y, color.RGBA{255, 255, 0, 255})
+		}
 		fmt.Println(kp.x, kp.y, kp.q)
+		count = c + 1
 	}
+	fmt.Println("there are", count, "nodes")
+	// Save to out.png
+	f, _ := os.OpenFile("out.png", os.O_WRONLY|os.O_CREATE, 0600)
+	defer f.Close()
+	png.Encode(f, img)
 }
 
 func (kc kitchen) getKitchenArea(size int) ([]cluster, error) {
@@ -170,7 +188,7 @@ func getOne(cc cluster, direction string) cluster {
 			c.q = 1
 			c.x = cc.x - 1
 		case 3:
-			c.q = 2
+			c.q = 4
 			c.x = cc.x - 1
 		case 4:
 			c.q = 3
@@ -194,31 +212,32 @@ func getOne(cc cluster, direction string) cluster {
 
 func (cc cluster) scanRing(size int, start string) ([]cluster, error) {
 	var cs []cluster
-	var c cluster
-	c = cc
-	for i := 0; i <= size-1; i++ {
+	cx := cc
+	cy := cc
+	for i := 1; i < size; i++ {
 		switch start {
 		//scan from
 		case "upright":
-			c = getOne(c, "down")
-			cs = append(cs, c)
-			c = getOne(c, "left")
-			cs = append(cs, c)
+			cy = getOne(cy, "down")
+			cs = append(cs, cy)
+			cx = getOne(cx, "left")
+			fmt.Println("get one left ", cx.x, cx.y, cx.q)
+			cs = append(cs, cx)
 		case "upleft":
-			c = getOne(c, "down")
-			cs = append(cs, c)
-			c = getOne(c, "right")
-			cs = append(cs, c)
+			cy = getOne(cy, "down")
+			cs = append(cs, cy)
+			cx = getOne(cx, "right")
+			cs = append(cs, cx)
 		case "downleft":
-			c = getOne(c, "right")
-			cs = append(cs, c)
-			c = getOne(c, "up")
-			cs = append(cs, c)
+			cx = getOne(cx, "right")
+			cs = append(cs, cx)
+			cy = getOne(cy, "up")
+			cs = append(cs, cy)
 		case "downright":
-			c = getOne(c, "up")
-			cs = append(cs, c)
-			c = getOne(c, "left")
-			cs = append(cs, c)
+			cy = getOne(cy, "up")
+			cs = append(cs, cy)
+			cx = getOne(cx, "left")
+			cs = append(cs, cx)
 		}
 	}
 	return cs, nil
