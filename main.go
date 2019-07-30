@@ -32,22 +32,25 @@ func main() {
 	img := image.NewRGBA(image.Rect(-25, -25, 50, 50))
 	var count int
 	for c, kp := range kitchenPoints {
-		// draw
-		col := rand.Intn(5)
-		switch col {
-		case 0:
-			img.Set(kp.x, kp.y, color.RGBA{255, 0, 255, 255})
-		case 1:
-			img.Set(kp.x, kp.y, color.RGBA{255, 0, 0, 255})
-		case 2:
-			img.Set(kp.x, kp.y, color.RGBA{0, 255, 0, 255})
-		case 3:
-			img.Set(kp.x, kp.y, color.RGBA{0, 0, 255, 255})
-		case 4:
-			img.Set(kp.x, kp.y, color.RGBA{255, 255, 0, 255})
-		case 5:
-			img.Set(kp.x, kp.y, color.RGBA{0, 255, 255, 255})
+		// change below to check each quadrant (1 to 4)
+		if kp.q == 4 {
+			col := rand.Intn(5)
+			switch col {
+			case 0:
+				img.Set(kp.x, kp.y, color.RGBA{255, 0, 255, 255})
+			case 1:
+				img.Set(kp.x, kp.y, color.RGBA{255, 0, 0, 255})
+			case 2:
+				img.Set(kp.x, kp.y, color.RGBA{0, 255, 0, 255})
+			case 3:
+				img.Set(kp.x, kp.y, color.RGBA{0, 0, 255, 255})
+			case 4:
+				img.Set(kp.x, kp.y, color.RGBA{255, 255, 0, 255})
+			case 5:
+				img.Set(kp.x, kp.y, color.RGBA{0, 255, 255, 255})
+			}
 		}
+
 		fmt.Println(kp.x, kp.y, kp.q)
 		count = c + 1
 	}
